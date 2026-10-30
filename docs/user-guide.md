@@ -62,21 +62,32 @@ nohup .venv/bin/streamlit run app.py > streamlit.log 2>&1 &
 
 > 반드시 `dematel` 폴더 안에서 실행하세요. 포트 등 설정 파일(`.streamlit/config.toml`)을 실행 위치 기준으로 읽습니다.
 
-### 1-3. 중지 · 업데이트
+### 1-3. 업데이트 · 중지
+
+새 버전이 GitHub에 올라오면 서버에서 아래 한 줄만 실행합니다.
 
 ```bash
-# 중지
-pkill -f "streamlit run app.py"
-
-# 새 버전으로 업데이트
-pkill -f "streamlit run app.py"
-cd ~/dematel && git pull
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python scripts/patch_index_html.py
-nohup .venv/bin/streamlit run app.py > streamlit.log 2>&1 &
+cd ~/dematel && ./scripts/update.sh
 ```
 
-로그 확인: `tail -f ~/dematel/streamlit.log`
+`update.sh`가 하는 일 (각 단계를 화면에 표시):
+
+1. 실행 중인 앱 중지
+2. `git pull`로 최신 코드 받기
+3. `.venv` 확인 (없을 때만 새로 만듦. **venv는 매번 만들 필요 없음**)
+4. 라이브러리 설치 (이미 설치된 것은 건너뜀)
+5. 링크 미리보기 제목·설명 적용 (`scripts/patch_index_html.py`)
+6. 앱 실행 후 30초 안에 응답하는지 확인. 응답이 없으면 로그 마지막 30줄을 보여 줌
+
+`.env`가 없으면 경고를 보여 주고 AI 기능 없이 실행합니다. 재실행하는 순간 접속 중인 사용자의 화면과 업로드 데이터가 초기화되므로 사용자가 적은 시간에 하세요.
+
+```bash
+# 중지만 할 때
+pkill -f "streamlit run app.py"
+
+# 로그 확인
+tail -f ~/dematel/streamlit.log
+```
 
 ### 1-4. 로컬 PC에 설치 (선택)
 
