@@ -1,10 +1,27 @@
 # Streamlit 배포 테스트 (학교 VM · 포트 3000)
 
-학교 VM에서 Streamlit을 포트 3000으로 실행했을 때 `aaa.thu.edu.tw` 포워딩을 통해 정상 동작하는지 확인하는 테스트입니다. 본 DEMATEL 앱을 만들기 전에 다음 사항을 미리 확인합니다.
+학교 VM에서 Streamlit을 포트 3000으로 실행했을 때 `https://thugmba.thu.edu.tw` 포워딩을 통해 정상 동작하는지 확인하는 테스트입니다. 본 DEMATEL 앱을 만들기 전에 다음 사항을 미리 확인합니다.
+
+```
+사용자 브라우저 ──HTTPS──▶ Cloudflare ──▶ 학교 포워딩 ──▶ VM:3000 (Streamlit)
+```
+
+- HTTPS는 학교 앞단의 Cloudflare가 처리합니다. VM에서는 nginx·인증서 설정 없이 Streamlit을 3000번으로 실행하기만 하면 됩니다.
 
 - 학교 포워딩이 **WebSocket**을 통과시키는지 (Streamlit 동작의 필수 조건)
 - 프록시를 거쳐도 **CSV 업로드**가 되는지 (403 오류 여부)
 - 장시간 연결이 유지되는지
+
+### 테스트 결과 (2026-10-30)
+
+| 항목 | 결과 |
+|---|---|
+| 외부 접속 `https://thugmba.thu.edu.tw/` | ✅ 200 |
+| 헬스체크 `/_stcore/health` | ✅ `ok` |
+| WebSocket `/_stcore/stream` (Cloudflare 경유) | ✅ 101 연결 성공 |
+| 화면 동작 (슬라이더 등) | ✅ 정상 |
+| CSV 업로드 (403 여부) | ⬜ 확인 필요 |
+| 10분 이상 연결 유지 | ⬜ 확인 필요 |
 
 ## 파일 구성
 
@@ -44,10 +61,19 @@ python3 --version
 python3 -m venv --help > /dev/null && echo "venv OK"
 
 # 3000번 포트를 쓰고 있는 프로그램 확인 (기존 Node 앱)
-ss -ltnp | grep :3000
+sudo ss -ltnp | grep :3000
 ```
 
 3000번 포트를 사용 중인 프로그램이 있으면 먼저 중지합니다. 실행 방식에 따라 명령이 다릅니다.
+
+> **이 VM에는 nginx가 기본 설치되어 3000번을 점유하고 있었습니다.** 외부 접속 시 "Welcome to nginx!" 페이지가 보이면 이 경우입니다. nginx는 이 구성에서 필요 없으므로 중지하고 자동 시작을 해제합니다.
+>
+> ```bash
+> sudo systemctl stop nginx
+> sudo systemctl disable nginx     # 재부팅 후 다시 켜지지 않게
+> ```
+>
+> 나중에 다시 필요하면 `sudo systemctl enable --now nginx`로 되돌릴 수 있습니다.
 
 ```bash
 pm2 list && pm2 stop <앱 이름>          # pm2로 실행 중인 경우
@@ -107,7 +133,7 @@ pkill -f "streamlit run app.py"        # 앱 종료
 
 ## 5. 외부 접속 확인 체크리스트
 
-PC나 휴대폰 브라우저에서 `https://aaa.thu.edu.tw`(또는 학교에서 안내한 주소)로 접속해 화면의 1~6번 항목을 순서대로 확인합니다.
+PC나 휴대폰 브라우저에서 `https://thugmba.thu.edu.tw`로 접속해 화면의 1~6번 항목을 순서대로 확인합니다.
 
 | # | 확인 항목 | 방법 | 정상 결과 |
 |:-:|---|---|---|
@@ -116,7 +142,7 @@ PC나 휴대폰 브라우저에서 `https://aaa.thu.edu.tw`(또는 학교에서 
 | 2 | CSV 업로드 | `samples/`의 두 파일을 함께 업로드 | 두 파일 모두 한글 요인명 표가 표시되고 인코딩이 각각 `utf-8-sig`, `cp949`로 나옴 |
 | 3 | 계산·그래프 | 그래프에 마우스 오버, 툴바 카메라 아이콘 | 값 표시, PNG 저장됨 |
 | 4 | 다운로드 | "결과 CSV 다운로드" 클릭 | `test_result.csv` 저장, Excel에서 열림 |
-| 5 | 언어·URL | 언어 선택 변경 | 인사말이 바뀌고 주소창에 `?lang=...` 표시. 브라우저 언어 값 확인 |
+| 5 | 언어·URL | 5번 항목의 "언어 선택" 드롭다운 변경 | 인사말만 바뀌고 주소창에 `?lang=...` 표시. 브라우저 언어 값 확인 (테스트 앱은 화면 전체를 번역하지 않음) |
 | 6 | 장시간 연결 | 탭을 10분 이상 둔 뒤 슬라이더 이동 | "세션 시작 시각"이 바뀌지 않음 |
 
 > 샘플 CSV는 서버가 아니라 **접속하는 PC**에 있어야 업로드할 수 있습니다. GitHub 저장소 페이지에서 `deploy-test/samples/`의 파일을 내려받아 사용하세요.
@@ -129,7 +155,8 @@ PC나 휴대폰 브라우저에서 `https://aaa.thu.edu.tw`(또는 학교에서 
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| 접속 시 "Please wait..." 또는 로딩 화면에서 멈춤 | 학교 포워딩이 **WebSocket 차단** | 전산실에 `aaa.thu.edu.tw`의 WebSocket(HTTP Upgrade 헤더) 허용 요청. 이 문제가 해결되지 않으면 Streamlit 사용 불가 |
+| 외부 접속 시 "Welcome to nginx!" 페이지 | VM의 nginx가 3000번 점유 | 2단계의 nginx 중지 |
+| 접속 시 "Please wait..." 또는 로딩 화면에서 멈춤 | 학교 포워딩이 **WebSocket 차단** | 전산실에 `thugmba.thu.edu.tw`의 WebSocket(HTTP Upgrade 헤더) 허용 요청. 이 문제가 해결되지 않으면 Streamlit 사용 불가 |
 | 업로드 시 `AxiosError: Request failed with status code 403` | 프록시와 XSRF 보호 충돌 | `.streamlit/config.toml`에서 `enableXsrfProtection = false`, `enableCORS = false` 주석 해제 후 재실행 |
 | 업로드 시 413 오류 | 학교 프록시의 업로드 크기 제한 | 전산실에 제한 크기 문의 (CSV는 보통 수 KB라 문제 가능성 낮음) |
 | 10분 후 "세션 시작 시각"이 바뀜 | 프록시의 유휴 연결 시간 초과 | 사용에는 지장 없지만 업로드한 데이터가 초기화됨. 전산실에 WebSocket timeout 연장 문의 |

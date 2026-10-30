@@ -259,7 +259,7 @@ INRM에 표시할 영향 관계를 고르는 기준입니다. tᵢⱼ ≥ θ인 
 | Excel 내보내기 | openpyxl | `.xlsx` 시트별 저장 |
 | 다국어 | JSON 번역 사전 (`locales/`) | 별도 i18n 라이브러리 없이 키-문자열 매핑 |
 | 테스트 | pytest | 계산·검증 로직 단위 테스트 |
-| 배포 | Streamlit Community Cloud | GitHub 저장소 연동 무료 배포 |
+| 배포 | 학교 제공 가상 서버 (Ubuntu) | `https://thugmba.thu.edu.tw` → VM 3000번 포트 포워딩 |
 
 설계 원칙:
 
@@ -283,7 +283,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-브라우저에서 `http://localhost:8501`이 열립니다.
+브라우저에서 `http://localhost:3000`으로 접속합니다(포트는 `.streamlit/config.toml`에서 지정).
 
 ### 테스트 실행
 
@@ -292,13 +292,53 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
-### 배포 (Streamlit Community Cloud)
+### 배포 (학교 가상 서버)
 
-1. 저장소를 GitHub에 push
-2. [share.streamlit.io](https://share.streamlit.io)에서 **New app** → 저장소, 브랜치 `main`, 메인 파일 `app.py` 선택
-3. **Advanced settings**에서 Python 버전 3.11 이상 지정 후 배포
+```
+사용자 브라우저 ──HTTPS──▶ Cloudflare ──▶ 학교 포워딩 ──▶ VM:3000 (Streamlit)
+```
 
-참고: 무료 플랜은 일정 기간 접속이 없으면 앱이 잠들며, 다음 접속 시 깨어나는 데 시간이 걸립니다.
+- 외부 주소 **`https://thugmba.thu.edu.tw`** 로 들어온 요청은 학교가 가상 서버의 **3000번 포트**로 포워딩합니다.
+- HTTPS 인증서는 학교 앞단의 Cloudflare가 처리하므로 VM에서 nginx나 인증서를 설정할 필요가 없습니다. Streamlit을 `0.0.0.0:3000`으로 실행하기만 하면 됩니다.
+- Cloudflare·학교 포워딩을 거친 WebSocket 연결은 확인 완료(2026-10-30, `deploy-test/` 테스트 앱).
+
+`.streamlit/config.toml`:
+
+```toml
+[server]
+address = "0.0.0.0"
+port = 3000
+headless = true
+maxUploadSize = 10
+
+[browser]
+gatherUsageStats = false
+```
+
+서버에서 최초 설치·실행:
+
+```bash
+# 3000번을 다른 프로그램이 쓰고 있지 않은지 확인 (VM 기본 설치된 nginx가 점유하는 경우가 있음)
+sudo ss -ltnp | grep :3000
+sudo systemctl stop nginx && sudo systemctl disable nginx   # nginx가 점유 중일 때만
+
+cd ~ && git clone https://github.com/thugmba/dematel.git && cd dematel
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+nohup .venv/bin/streamlit run app.py > streamlit.log 2>&1 &
+curl http://localhost:3000/_stcore/health   # ok
+```
+
+코드 업데이트:
+
+```bash
+pkill -f "streamlit run app.py"
+cd ~/dematel && git pull
+.venv/bin/pip install -r requirements.txt
+nohup .venv/bin/streamlit run app.py > streamlit.log 2>&1 &
+```
+
+자세한 확인 절차와 문제 해결은 [`deploy-test/README.md`](deploy-test/README.md)를 참고하세요.
 
 ## 디렉터리 구조
 
@@ -345,7 +385,7 @@ dematel/
 ## 데이터 처리 및 개인정보
 
 - 업로드한 파일은 서버 메모리(`st.session_state`)에서만 처리하며 디스크나 데이터베이스에 저장하지 않습니다. 브라우저 탭을 닫아 세션이 끝나면 삭제됩니다.
-- Streamlit Community Cloud 앱은 기본적으로 URL을 아는 누구나 접속할 수 있습니다. 접근을 제한하려면 앱 설정에서 열람자를 지정합니다.
+- 앱은 `https://thugmba.thu.edu.tw`로 누구나 접속할 수 있는 공개 서비스입니다. 업로드 데이터는 학교 VM의 메모리에서만 처리됩니다.
 - 파일명이 전문가 이름이면 화면과 내보내기 파일에서는 `Expert 1`, `Expert 2` … 로 익명화하는 옵션을 제공합니다.
 
 ---
