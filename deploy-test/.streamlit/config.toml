@@ -1,0 +1,12 @@
+[server]
+address = "0.0.0.0"     # 학교 포워딩이 VM 외부에서 들어오므로 모든 인터페이스에서 수신
+port = 3000
+headless = true
+maxUploadSize = 10      # MB
+
+# 프록시 뒤에서 CSV 업로드 시 403 오류가 나면 아래 두 줄의 주석을 해제
+# enableXsrfProtection = false
+# enableCORS = false
+
+[browser]
+gatherUsageStats = false
