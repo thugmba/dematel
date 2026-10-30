@@ -44,6 +44,9 @@ cd dematel
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 
+# 링크 미리보기 제목·설명 설정 (pip install 할 때마다 다시 실행)
+.venv/bin/python scripts/patch_index_html.py
+
 # (선택) AI 논문 문장 기능: 학교 LLM 정보를 .env 파일에 저장
 cat > .env <<'EOF'
 LLM_API_KEY=발급받은_API_키
@@ -69,6 +72,7 @@ pkill -f "streamlit run app.py"
 pkill -f "streamlit run app.py"
 cd ~/dematel && git pull
 .venv/bin/pip install -r requirements.txt
+.venv/bin/python scripts/patch_index_html.py
 nohup .venv/bin/streamlit run app.py > streamlit.log 2>&1 &
 ```
 
@@ -128,6 +132,7 @@ cd ~/dematel
 | 화면이 "Please wait..."에서 멈춤 | 학교 포워딩의 WebSocket 차단 → 전산실 문의 |
 | 파일 업로드 시 403 오류 | `.streamlit/config.toml`에서 `enableXsrfProtection = false`, `enableCORS = false` 주석 해제 후 재시작 |
 | `python3 -m venv` 실패 | `sudo apt install python3-venv` |
+| 링크를 보내면 미리보기에 "Streamlit", "You need to enable JavaScript…"가 보임 | `.venv/bin/python scripts/patch_index_html.py` 실행 후 앱 재시작. 메신저는 미리보기를 캐시하므로 반영까지 시간이 걸릴 수 있음 |
 
 ---
 

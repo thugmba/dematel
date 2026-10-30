@@ -379,6 +379,8 @@ cd ~/dematel && git pull
 nohup .venv/bin/streamlit run app.py > streamlit.log 2>&1 &
 ```
 
+**링크 미리보기**: Streamlit은 화면을 JavaScript로 그리므로, JavaScript를 실행하지 않는 메신저·SNS 미리보기에는 기본 HTML의 `<title>Streamlit</title>`과 "You need to enable JavaScript…" 문구가 보입니다. `scripts/patch_index_html.py`가 설치된 Streamlit의 `static/index.html`에 앱 제목·설명·Open Graph 태그를 넣습니다. 원본은 `index.html.orig`로 보관하고 매번 원본에서 다시 만들므로 여러 번 실행해도 같습니다. Streamlit을 설치·업그레이드하면 원래대로 돌아가므로 `pip install` 뒤마다 다시 실행해야 합니다.
+
 자세한 확인 절차와 문제 해결은 [`deploy-test/README.md`](../deploy-test/README.md)를 참고하세요.
 
 ## 디렉터리 구조
@@ -415,6 +417,8 @@ dematel/
 │   └── user-guide.md       # 사용자 설명서 (설치·테스트·사용 방법)
 ├── .streamlit/
 │   └── config.toml         # 포트 3000, 업로드 크기 제한, 툴바
+├── scripts/
+│   └── patch_index_html.py # 링크 미리보기용 제목·설명·og 태그를 Streamlit index.html에 삽입
 ├── pyproject.toml          # pytest 설정
 ├── requirements.txt
 ├── requirements-dev.txt    # pytest 등 개발용 의존성
