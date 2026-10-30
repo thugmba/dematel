@@ -148,7 +148,7 @@
   "ai.generate": "產生文句",
   "ai.regenerate": "重新產生",
   "ai.generating": "撰寫中……",
-  "ai.privacy": "點選按鈕後，因素名稱與分析結果數值（不含上傳檔案本身）將傳送至學校 LLM 伺服器（{model}）。",
+  "ai.privacy": "使用 AI 產生段落。",
   "ai.error": "無法產生 AI 文句，請稍後再試。（{detail}）",
   "ai.review_notice": "數值已由分析結果自動填入。請檢查文字表達與解讀是否正確後，再用於論文。",
   "ai.copy": "複製用文字",
@@ -166,5 +166,6 @@
   "ai.blocked": "AI 自行撰寫數字或使用未定義的佔位符，經 {attempts} 次嘗試後已封鎖此草稿。請再試一次。",
   "ai.blocked_detail": "最後一次嘗試的規則違反內容",
   "results.header": "2. 分析結果",
-  "ai.language_help": "預設為畫面語言。選擇其他語言即可用該語言撰寫論文文句；變更畫面語言時會重設為新的畫面語言。"
+  "ai.language_help": "預設為畫面語言。選擇其他語言即可用該語言撰寫論文文句；變更畫面語言時會重設為新的畫面語言。",
+  "ai.beta_free": "測試版期間可免費使用 AI 功能。"
 }

@@ -148,7 +148,7 @@
   "ai.generate": "Generate draft",
   "ai.regenerate": "Regenerate",
   "ai.generating": "Writing…",
-  "ai.privacy": "When you click the button, factor names and analysis results (not your files) are sent to the university LLM server ({model}).",
+  "ai.privacy": "Paragraphs are generated using AI.",
   "ai.error": "The AI draft could not be generated. Try again later. ({detail})",
   "ai.review_notice": "Numbers are filled in automatically from the analysis. Review the wording and interpretation before using it in a paper.",
   "ai.copy": "Text for copying",
@@ -166,5 +166,6 @@
   "ai.blocked": "The AI kept writing numbers itself or using undefined placeholders, so the draft was blocked after {attempts} attempts. Please try again.",
   "ai.blocked_detail": "Rule violations in the last attempt",
   "results.header": "2. Analysis results",
-  "ai.language_help": "Defaults to the screen language. Choose another language to write the paper text in it; changing the screen language resets this to the new screen language."
+  "ai.language_help": "Defaults to the screen language. Choose another language to write the paper text in it; changing the screen language resets this to the new screen language.",
+  "ai.beta_free": "AI features are free during the beta period."
 }

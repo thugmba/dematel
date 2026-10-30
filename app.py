@@ -225,6 +225,7 @@ else:
 if LLM_CONFIG is not None:
     with ai_box:
         st.header(t("ai.sidebar_header"))
+        st.caption(t("ai.beta_free"))
         # 작성 언어는 화면 언어를 따르되, 사용자가 바꿀 수 있다. 화면 언어를 바꾸면 다시 화면 언어로 맞춘다.
         if ss.get("ai_lang_ui") != ss.lang:
             ss.ai_lang = ss.lang
@@ -263,7 +264,7 @@ def ai_section(kind: str) -> None:
         t("ai.regenerate") if result else t("ai.generate"),
         type="secondary" if result else "primary", key=f"ai_generate_{kind}",
     )
-    st.caption(t("ai.privacy", model=LLM_CONFIG.model))
+    st.caption(t("ai.privacy", model=LLM_CONFIG.model) + " " + t("ai.beta_free"))
     if clicked:
         try:
             with st.spinner(t("ai.generating")):
