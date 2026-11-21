@@ -406,3 +406,7 @@ with tab_exp:
         type="primary", width="stretch",
     )
     c2.caption(t("exp.excel_hint"))
+
+st.divider()
+with st.expander(t("footer.references_title")):
+    st.markdown(t("footer.references_body"))

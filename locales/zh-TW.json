@@ -167,5 +167,7 @@
   "ai.blocked_detail": "最後一次嘗試的規則違反內容",
   "results.header": "2. 分析結果",
   "ai.language_help": "預設為畫面語言。選擇其他語言即可用該語言撰寫論文文句；變更畫面語言時會重設為新的畫面語言。",
-  "ai.beta_free": "測試版期間可免費使用 AI 功能。"
+  "ai.beta_free": "測試版期間可免費使用 AI 功能。",
+  "footer.references_title": "參考文獻（DEMATEL 方法論）",
+  "footer.references_body": "Gabus, A., & Fontela, E. (1972). *World problems: An invitation to further thought within the framework of DEMATEL*. Battelle Geneva Research Centre.\n\nSi, S.-L., You, X.-Y., Liu, H.-C., & Zhang, P. (2018). DEMATEL technique: A systematic review of the state-of-the-art literature on methodologies and applications. *Mathematical Problems in Engineering, 2018*, Article 3696457. https://doi.org/10.1155/2018/3696457\n\nTzeng, G.-H., Chiang, C.-H., & Li, C.-W. (2007). Evaluating intertwined effects in e-learning programs: A novel hybrid MCDM model based on factor analysis and DEMATEL. *Expert Systems with Applications, 32*(4), 1028–1044. https://doi.org/10.1016/j.eswa.2006.02.004"
 }
